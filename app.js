@@ -5,12 +5,12 @@ import GameplayState from "./states/gameplay.js";
 class Game extends Phaser.Game {
     constructor() {
         super(
-            1080,
-            1920,
+            1280,
+            720,
             Phaser.CANVAS,
             ""
         );
-
+        // console.log(Phaser.State);
         this.state.add("Boot", BootState, false);
         this.state.add("Preload", PreloadState, false);
         this.state.add("Gameplay", GameplayState, false);
