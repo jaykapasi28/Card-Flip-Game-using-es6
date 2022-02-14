@@ -6,7 +6,7 @@ class Game extends Phaser.Game {
     constructor() {
         super(
             1280,
-            720,
+            850,
             Phaser.CANVAS,
             ""
         );
