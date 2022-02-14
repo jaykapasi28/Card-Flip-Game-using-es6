@@ -10,11 +10,16 @@ export default class GameplayState extends Phaser.State {
     create() {
         this.bg = this.game.add.sprite(0, 0, "bg");
 
+        this.timeInSeconds = 300;
+        this.timeText = this.game.add.text(20, 20, "0:00",{font: '50px Arial', fill: '#ff0000'});
+        this.timer = this.game.time.events.loop(Phaser.Timer.SECOND, this.updateTimer, this);
+
         this.tiles = this.game.add.group();
 
         var k = 1
-        for(var j=0; j<4; j++) {
-            for(var i = 0;i < 5; i++ ){
+        for( var j = 0; j < 4; j++ ) {
+            for( var i = 0;i < 5; i++ ){
+                this.arr = [];
                 this.tile = this.tiles.create(i * 180 + 190, j * 174 + 20, "tile3")
                 this.tile.scale.setTo(0.7, 0.7);
                 this.tile.id = k;
@@ -25,78 +30,102 @@ export default class GameplayState extends Phaser.State {
         }
     }
 
-    clickedOnTile(sprite, pointer) {
-        this.clickedSprite = sprite;
-            game.add.tween(this.clickedSprite.scale).to({ 
-                x: 0
-            }, 500, Phaser.Easing.Linear.None, true, 0).onComplete.addOnce(this.addNewTile, this)
-        
+
+    updateTimer() {
+        this.timeInSeconds--;
+        var minutes = Math.floor(this.timeInSeconds / 60);
+        var seconds = this.timeInSeconds - (minutes * 60);
+        var timeString = this.addZeros(minutes) + ":" + this.addZeros(seconds);
+        this.timeText.text = timeString;
+
+        if ( this.timeInSeconds == 0 ) {
+            this.game.state.restart();
+        }
     }
+
+
+    addZeros(num) {
+        if (num < 10) {
+            num = "0" + num;
+        }
+        return num;
+    }
+
+
+    clickedOnTile(sprite) {
+        this.clickedSprite = sprite;
+            this.game.add.tween(this.clickedSprite).to({ 
+                alpha: 0
+            }, 500, Phaser.Easing.Linear.None, true, 0).onComplete.addOnce(this.addNewTile, this)
+    }
+
 
     addNewTile() {
         this.newTile = this.game.add.sprite(this.clickedSprite.world.x, this.clickedSprite.world.y, "tile")
         this.newTile.scale.setTo(0.7, 0.7);
-
-        if(this.clickedSprite.id == 1 || this.clickedSprite.id == 8) {
-            this.cat = this.game.add.sprite(20, 20, "cat")
-            this.newTile.addChild(this.cat);
-            this.cat.scale.setTo(0.8, 0.8);
-        } 
-        
-        else if(this.clickedSprite.id == 2 || this.clickedSprite.id == 5) {
-            this.dog = this.game.add.sprite(20, 20, "dog")
-            this.newTile.addChild(this.dog);
-            this.dog.scale.setTo(0.8, 0.8);
-        } 
-        
-        else if(this.clickedSprite.id == 6 || this.clickedSprite.id == 9) {
-            this.elephant = this.game.add.sprite(20, 20, "elephant")
-            this.newTile.addChild(this.elephant);
-            this.elephant.scale.setTo(0.8, 0.8);
-        } 
-        
-        else if(this.clickedSprite.id == 4 || this.clickedSprite.id == 17) {
-            this.monkey = this.game.add.sprite(20, 20, "monkey")
-            this.newTile.addChild(this.monkey);
-            this.monkey.scale.setTo(0.8, 0.8);
-        } 
-        
-        else if(this.clickedSprite.id == 10 || this.clickedSprite.id == 14) {
-            this.horse = this.game.add.sprite(20, 20, "horse")
-            this.newTile.addChild(this.horse);
-            this.horse.scale.setTo(0.8, 0.8);
-        }
-
-        else if(this.clickedSprite.id == 16 || this.clickedSprite.id == 20) {
-            this.kangaroo = this.game.add.sprite(20, 20, "kangaroo")
-            this.newTile.addChild(this.kangaroo);
-            this.kangaroo.scale.setTo(0.8, 0.8);
-        }
-
-        else if(this.clickedSprite.id == 12 || this.clickedSprite.id == 13) {
-            this.lion = this.game.add.sprite(20, 20, "lion")
-            this.newTile.addChild(this.lion);
-            this.lion.scale.setTo(0.8, 0.8);
-        }
-
-        else if(this.clickedSprite.id == 3 || this.clickedSprite.id == 7) {
-            this.pig = this.game.add.sprite(20, 20, "pig")
-            this.newTile.addChild(this.pig);
-            this.pig.scale.setTo(0.8, 0.8);
-        }
-
-        else if(this.clickedSprite.id == 11 || this.clickedSprite.id == 15) {
-            this.rabbit = this.game.add.sprite(20, 20, "rabbit")
-            this.newTile.addChild(this.rabbit);
-            this.rabbit.scale.setTo(0.8, 0.8);
-        }
-
-        else if(this.clickedSprite.id == 18 || this.clickedSprite.id == 19) {
-            this.ship = this.game.add.sprite(20, 20, "ship")
-            this.newTile.addChild(this.ship);
-            this.ship.scale.setTo(0.8, 0.8);
-        }
+        this.animalCard(1, 8, "cat");
+        this.animalCard(2, 5, "dog");
+        this.animalCard(6, 9, "elephant");
+        this.animalCard(4, 17, "monkey");
+        this.animalCard(10, 14, "horse");
+        this.animalCard(16, 20, "kangaroo");
+        this.animalCard(12, 13, "lion");
+        this.animalCard(3, 7, "pig");
+        this.animalCard(11, 15, "rabbit");
+        this.animalCard(18, 19, "ship");
     }
+    
+
+    animalCard(a, b, animalName) {
+        if(this.clickedSprite.id == a || this.clickedSprite.id == b) {
+            this.newTile.id = animalName;
+            this.animal = this.game.add.sprite(25, 30, animalName);
+            this.newTile.addChild(this.animal);
+            this.animal.scale.setTo(0.8, 0.8);
+            this.checkForArraySize();
+        } 
+    }
+
+
+    checkForArraySize() {
+        if(this.arr.length >= 2) {
+            this.arr = [];
+            this.arr.push(this.newTile);
+        } else {
+            this.arr.push(this.newTile);
+        }
+        this.checkTwoCards()
+    } 
+
+
+    checkTwoCards() {
+        if( this.arr.length >= 2 ) {
+            if( this.arr[0].id != this.arr[1].id ) {
+                this.closeCard();
+            } 
+            else if( this.arr[0].world.x == this.arr[1].world.x  && this.arr[0].world.y == this.arr[1].world.y ) {
+                this.arr.pop(this.arr[1])
+                console.log(this.arr);
+            }
+        } 
+    }
+
+    closeCard() {
+        this.game.add.tween(this.arr[0]).to({
+            alpha: 0
+        }, 1000, Phaser.Easing.Linear.None, true, 0, 0, false).onComplete.addOnce(() => {
+            this.tile = this.game.add.sprite(this.arr[0].world.x, this.arr[0].world.y, "tile3")
+            this.tile.scale.setTo(0.7, 0.7)
+        }) 
+
+        this.game.add.tween(this.arr[1]).to({
+            alpha: 0
+        }, 1000, Phaser.Easing.Linear.None, true, 0, 0, false).onComplete.addOnce(() => {
+            this.tile = this.game.add.sprite(this.arr[1].world.x, this.arr[1].world.y, "tile3")
+            this.tile.scale.setTo(0.7, 0.7)
+        })
+    }
+
 
     update() {
 
