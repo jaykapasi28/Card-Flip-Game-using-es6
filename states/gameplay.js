@@ -1,7 +1,7 @@
 export default class GameplayState extends Phaser.State {
-  init() {}
+  init() { }
 
-  preload() {}
+  preload() { }
 
   create() {
     (this.animalList = [
@@ -112,7 +112,7 @@ export default class GameplayState extends Phaser.State {
       this.tileArr[i].backTile.inputEnabled = false;
     });
     this.game.time.events.add(
-      Phaser.Timer.SECOND - 500,
+      Phaser.Timer.SECOND,
       () => {
         this.tileArr.forEach((e, i) => {
           this.tileArr[i].backTile.inputEnabled = true;
@@ -121,15 +121,18 @@ export default class GameplayState extends Phaser.State {
       this
     );
     this.backTile.inputEnabled = false;
-    this.tileArr[sprite.id - 1].backTile.visible = false;
-    this.tileArr[sprite.id - 1].frontTile.visible = true;
+    this.game.add.tween(this.tileArr[sprite.id - 1].backTile.scale).to({
+      x: 0
+    }, 1000, Phaser.Easing.Linear.None, true, 0, 0, false).onComplete.add(() => {
+      this.tileArr[sprite.id - 1].backTile.visible = false;
+      this.tileArr[sprite.id - 1].frontTile.visible = true;
+    });
     if (this.animalNameArr.length >= 2) {
       this.animalNameArr = [];
       this.animalNameArr.push(this.tileArr[sprite.id - 1]);
     } else {
       this.animalNameArr.push(this.tileArr[sprite.id - 1]);
     }
-    console.log(this.animalNameArr);
     this.checkTwoCards();
   }
 
@@ -139,20 +142,21 @@ export default class GameplayState extends Phaser.State {
         this.animalNameArr[0].animalTile.key !=
         this.animalNameArr[1].animalTile.key
       ) {
-        console.log(this.animalNameArr);
         this.game.time.events.add(
-          Phaser.Timer.SECOND - 500,
+          Phaser.Timer.SECOND + 100,
           () => {
             this.animalNameArr[0].frontTile.visible = false;
             this.animalNameArr[0].backTile.visible = true;
+            this.animalNameArr[0].backTile.scale.x = 0.7
           },
           this
         );
         this.game.time.events.add(
-          Phaser.Timer.SECOND - 500,
+          Phaser.Timer.SECOND + 100,
           () => {
             this.animalNameArr[1].frontTile.visible = false;
             this.animalNameArr[1].backTile.visible = true;
+            this.animalNameArr[1].backTile.scale.x = 0.7
           },
           this
         );
@@ -160,5 +164,10 @@ export default class GameplayState extends Phaser.State {
     }
   }
 
-  update() {}
+  update() { }
 }
+
+// this.game.add.tween(sprite.scale).to({
+//   x: 0,
+//   y: 0
+// }, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
