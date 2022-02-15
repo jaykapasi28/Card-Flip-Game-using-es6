@@ -1,22 +1,43 @@
 export default class GameplayState extends Phaser.State {
-  init() {
+  init() {}
 
-  }
-
-  preload() {
-
-  }
+  preload() {}
 
   create() {
-    this.bg = this.game.add.sprite(0, 0, "bg");
-    this.bg1 = this.game.add.sprite(0, 720, "bg");
+    (this.animalList = [
+      "cat",
+      "dog",
+      "pig",
+      "monkey",
+      "dog",
+      "elephant",
+      "pig",
+      "cat",
+      "elephant",
+      "horse",
+      "rabbit",
+      "lion",
+      "lion",
+      "horse",
+      "rabbit",
+      "kangaroo",
+      "monkey",
+      "ship",
+      "ship",
+      "kangaroo",
+    ]),
+      (this.tileArr = []);
+    this.animalNameArr = [];
 
-    this.timeInSeconds = 300;
+    this.bg = this.game.add.sprite(0, 0, "bg");
+    this.bg1 = this.game.add.sprite(0, 300, "bg");
+
+    this.timeInSeconds = 180;
     this.gameTitle = this.game.add.text(440, 20, "Card Flip Game!", {
       font: "50px Algerian",
       fill: "#ffff4d",
     });
-    this.timeText = this.game.add.text(590, 100, "05:00", {
+    this.timeText = this.game.add.text(590, 100, "03:00", {
       font: "30px Arial",
       fill: "#ff0000",
     });
@@ -28,15 +49,40 @@ export default class GameplayState extends Phaser.State {
 
     this.tiles = this.game.add.group();
 
-    var k = 1;
+    var k = 0;
     for (var j = 0; j < 4; j++) {
       for (var i = 0; i < 5; i++) {
         this.arr = [];
-        this.tile = this.tiles.create(i * 180 + 190, j * 174 + 150, "tile3");
-        this.tile.scale.setTo(0.7, 0.7);
-        this.tile.id = k;
-        this.tile.inputEnabled = true;
-        this.tile.events.onInputDown.add(this.clickedOnTile, this);
+        this.backTile = this.tiles.create(
+          i * 180 + 190,
+          j * 174 + 150,
+          "tile3"
+        );
+        this.backTile.scale.setTo(0.7, 0.7);
+        this.backTile.inputEnabled = true;
+        this.backTile.events.onInputDown.add(this.clickedOnTile, this);
+        this.backTile.id = k + 1;
+
+        this.frontTile = this.game.add.sprite(
+          i * 180 + 190,
+          j * 174 + 150,
+          "tile"
+        );
+        this.frontTile.scale.setTo(0.7, 0.7);
+
+        this.animalTile = this.game.add.sprite(25, 30, this.animalList[k]);
+        this.frontTile.addChild(this.animalTile);
+        this.animalTile.scale.setTo(0.8, 0.8);
+        this.frontTile.visible = false;
+
+        const singleTiles = {
+          backTile: this.backTile,
+          frontTile: this.frontTile,
+          animalTile: this.animalTile,
+          id: this.backTile.id,
+        };
+
+        this.tileArr.push(singleTiles);
         k++;
       }
     }
@@ -62,121 +108,57 @@ export default class GameplayState extends Phaser.State {
   }
 
   clickedOnTile(sprite) {
-    this.clickedSprite = sprite;
-    this.game.add
-      .tween(this.clickedSprite)
-      .to(
-        {
-          alpha: 0,
-        },
-        500,
-        Phaser.Easing.Linear.None,
-        true,
-        0
-      )
-      .onComplete.addOnce(this.addNewTile, this);
-  }
-
-  addNewTile() {
-    this.newTile = this.game.add.sprite(
-      this.clickedSprite.world.x,
-      this.clickedSprite.world.y,
-      "tile"
+    this.tileArr.forEach((e, i) => {
+      this.tileArr[i].backTile.inputEnabled = false;
+    });
+    this.game.time.events.add(
+      Phaser.Timer.SECOND - 500,
+      () => {
+        this.tileArr.forEach((e, i) => {
+          this.tileArr[i].backTile.inputEnabled = true;
+        });
+      },
+      this
     );
-    this.newTile.scale.setTo(0.7, 0.7);
-    this.animalCard(1, 8, "cat");
-    this.animalCard(2, 5, "dog");
-    this.animalCard(6, 9, "elephant");
-    this.animalCard(4, 17, "monkey");
-    this.animalCard(10, 14, "horse");
-    this.animalCard(16, 20, "kangaroo");
-    this.animalCard(12, 13, "lion");
-    this.animalCard(3, 7, "pig");
-    this.animalCard(11, 15, "rabbit");
-    this.animalCard(18, 19, "ship");
-  }
-
-  animalCard(a, b, animalName) {
-    if (this.clickedSprite.id == a || this.clickedSprite.id == b) {
-      this.newTile.id = animalName;
-      this.animal = this.game.add.sprite(25, 30, animalName);
-      this.newTile.addChild(this.animal);
-      this.animal.scale.setTo(0.8, 0.8);
-      this.checkForArraySize();
-    }
-  }
-
-  checkForArraySize() {
-    if (this.arr.length >= 2) {
-      this.arr = [];
-      this.arr.push(this.newTile);
+    this.backTile.inputEnabled = false;
+    this.tileArr[sprite.id - 1].backTile.visible = false;
+    this.tileArr[sprite.id - 1].frontTile.visible = true;
+    if (this.animalNameArr.length >= 2) {
+      this.animalNameArr = [];
+      this.animalNameArr.push(this.tileArr[sprite.id - 1]);
     } else {
-      this.arr.push(this.newTile);
+      this.animalNameArr.push(this.tileArr[sprite.id - 1]);
     }
+    console.log(this.animalNameArr);
     this.checkTwoCards();
   }
 
   checkTwoCards() {
-    if (this.arr.length >= 2) {
-      if (this.arr[0].id != this.arr[1].id) {
-        this.closeCard();
-      } else if (
-        this.arr[0].world.x == this.arr[1].world.x &&
-        this.arr[0].world.y == this.arr[1].world.y
+    if (this.animalNameArr.length >= 2) {
+      if (
+        this.animalNameArr[0].animalTile.key !=
+        this.animalNameArr[1].animalTile.key
       ) {
-        this.arr.pop(this.arr[1]);
+        console.log(this.animalNameArr);
+        this.game.time.events.add(
+          Phaser.Timer.SECOND - 500,
+          () => {
+            this.animalNameArr[0].frontTile.visible = false;
+            this.animalNameArr[0].backTile.visible = true;
+          },
+          this
+        );
+        this.game.time.events.add(
+          Phaser.Timer.SECOND - 500,
+          () => {
+            this.animalNameArr[1].frontTile.visible = false;
+            this.animalNameArr[1].backTile.visible = true;
+          },
+          this
+        );
       }
     }
   }
 
-  closeCard() {
-    this.game.add
-      .tween(this.arr[0])
-      .to(
-        {
-          alpha: 0,
-        },
-        1000,
-        Phaser.Easing.Linear.None,
-        true,
-        0,
-        0,
-        false
-      )
-      .onComplete.addOnce(() => {
-        this.tile = this.game.add.sprite(
-          this.arr[0].world.x,
-          this.arr[0].world.y,
-          "tile3"
-        );
-        this.tile.scale.setTo(0.7, 0.7);
-      });
-
-    this.game.add
-      .tween(this.arr[1])
-      .to(
-        {
-          alpha: 0,
-        },
-        1000,
-        Phaser.Easing.Linear.None,
-        true,
-        0,
-        0,
-        false
-      )
-      .onComplete.addOnce(() => {
-        this.tile = this.game.add.sprite(
-          this.arr[1].world.x,
-          this.arr[1].world.y,
-          "tile3"
-        );
-        this.tile.scale.setTo(0.7, 0.7);
-      });
-  }
-
-  update() {
-
-  }
-
+  update() {}
 }
