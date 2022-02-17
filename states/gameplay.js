@@ -1,10 +1,14 @@
 export default class GameplayState extends Phaser.State {
-  init() { }
+  init() { 
 
-  preload() { }
+  }
+
+  preload() { 
+
+  }
 
   create() {
-    (this.animalList = [
+    this.animalList = [
       "cat",
       "dog",
       "pig",
@@ -25,8 +29,9 @@ export default class GameplayState extends Phaser.State {
       "ship",
       "ship",
       "kangaroo",
-    ]),
-      (this.tileArr = []);
+    ];
+
+    this.tileArr = [];
     this.animalNameArr = [];
 
     this.bg = this.game.add.sprite(0, 0, "bg");
@@ -54,27 +59,29 @@ export default class GameplayState extends Phaser.State {
       for (var i = 0; i < 5; i++) {
         this.arr = [];
         this.backTile = this.tiles.create(
-          i * 180 + 190,
-          j * 174 + 150,
+          i * 180 + 190 + 75,
+          j * 174 + 150 + 80,
           "tile3"
         );
+        this.backTile.anchor.setTo(0.5, 0.5);
         this.backTile.scale.setTo(0.7, 0.7);
         this.backTile.inputEnabled = true;
         this.backTile.events.onInputDown.add(this.clickedOnTile, this);
         this.backTile.id = k + 1;
 
         this.frontTile = this.game.add.sprite(
-          i * 180 + 190,
-          j * 174 + 150,
+          i * 180 + 190 + 75,
+          j * 174 + 150 + 80,
           "tile"
         );
+        this.frontTile.anchor.setTo(0.5, 0.5);
         this.frontTile.scale.setTo(0.7, 0.7);
 
-        this.animalTile = this.game.add.sprite(25, 30, this.animalList[k]);
+        this.animalTile = this.game.add.sprite(0, 0, this.animalList[k]);
         this.frontTile.addChild(this.animalTile);
         this.animalTile.scale.setTo(0.8, 0.8);
         this.frontTile.visible = false;
-
+        this.animalTile.anchor.setTo(0.5, 0.5)
         const singleTiles = {
           backTile: this.backTile,
           frontTile: this.frontTile,
@@ -112,7 +119,7 @@ export default class GameplayState extends Phaser.State {
       this.tileArr[i].backTile.inputEnabled = false;
     });
     this.game.time.events.add(
-      Phaser.Timer.SECOND,
+      Phaser.Timer.SECOND - 500,
       () => {
         this.tileArr.forEach((e, i) => {
           this.tileArr[i].backTile.inputEnabled = true;
@@ -123,7 +130,7 @@ export default class GameplayState extends Phaser.State {
     this.backTile.inputEnabled = false;
     this.game.add.tween(this.tileArr[sprite.id - 1].backTile.scale).to({
       x: 0
-    }, 1000, Phaser.Easing.Linear.None, true, 0, 0, false).onComplete.add(() => {
+    }, 500, Phaser.Easing.Linear.None, true, 0, 0, false).onComplete.add(() => {
       this.tileArr[sprite.id - 1].backTile.visible = false;
       this.tileArr[sprite.id - 1].frontTile.visible = true;
     });
@@ -143,7 +150,7 @@ export default class GameplayState extends Phaser.State {
         this.animalNameArr[1].animalTile.key
       ) {
         this.game.time.events.add(
-          Phaser.Timer.SECOND + 100,
+          Phaser.Timer.SECOND,
           () => {
             this.animalNameArr[0].frontTile.visible = false;
             this.animalNameArr[0].backTile.visible = true;
@@ -152,7 +159,7 @@ export default class GameplayState extends Phaser.State {
           this
         );
         this.game.time.events.add(
-          Phaser.Timer.SECOND + 100,
+          Phaser.Timer.SECOND,
           () => {
             this.animalNameArr[1].frontTile.visible = false;
             this.animalNameArr[1].backTile.visible = true;
@@ -164,10 +171,7 @@ export default class GameplayState extends Phaser.State {
     }
   }
 
-  update() { }
-}
+  update() { 
 
-// this.game.add.tween(sprite.scale).to({
-//   x: 0,
-//   y: 0
-// }, 1000, Phaser.Easing.Linear.None, true, 0, 0, false);
+  }
+}
